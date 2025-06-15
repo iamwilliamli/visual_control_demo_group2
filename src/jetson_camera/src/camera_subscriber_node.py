@@ -25,8 +25,6 @@ class CameraSubscriberNode:
         self.first_image_received = False
         self.initialized = True
         rospy.loginfo("Camera subscriber node initialized!")
-        
-        self.count = 3101
 
     def image_cb(self, data):
         if not self.initialized:
@@ -43,12 +41,6 @@ class CameraSubscriberNode:
             # Ensure the window updates instantly
             cv2.imshow("Camera View", cv_image)
             cv2.waitKey(1)  # Keep at 1 to prevent blocking
-            
-            if self.count % 100 == 0:
-                filename = "/home/hoangdung/study/embeded_visual_control/workshop2_2211025/src/jetson_camera/data/IGM_" + str(self.count) + ".jpeg"
-                cv2. imwrite(filename, cv_image)
-                
-            self.count += 1
         except CvBridgeError as err:
             rospy.logerr("Error converting image: {}".format(err))
 
@@ -57,7 +49,7 @@ class CameraSubscriberNode:
 
 if __name__ == "__main__":
     # Initialize the node
-    rospy.init_node('camera_subscriber_node', anonymous=True)
+    rospy.init_node('camera_subscriber_node', anonymous=False, xmlrpc_port=45200, tcpros_port=45201)
     camera_node = CameraSubscriberNode()
     try:
         rospy.spin()

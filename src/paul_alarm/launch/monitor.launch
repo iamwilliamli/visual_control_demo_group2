@@ -1,0 +1,3 @@
+<launch>
+  <node pkg="paul_alarm" type="dual_image_subscriber_node.py" name="alarm_display" output="screen"/>
+</launch>

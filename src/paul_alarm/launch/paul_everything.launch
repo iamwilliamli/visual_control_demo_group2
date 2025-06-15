@@ -1,0 +1,9 @@
+<launch>
+    <node pkg="people_count" type="dual_images_subscriber_node_alex.py" name="people_counter"
+        output="screen">
+    </node>
+    <node pkg="paul_alarm" type="alarm_omni.py" name="alarm_omni" output="screen"/>
+    <node pkg="paul_alarm" type="dual_image_subscriber_node.py" name="alarm_display" output="screen"/>
+    <node pkg="paul_alarm" type="image_processing_node_paul.py" name="undistort_paul" output="screen"/>
+    <node pkg="qr_switch" type="scanner_node.py" name="qr_node" output="screen"/>
+</launch>

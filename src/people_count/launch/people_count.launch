@@ -1,0 +1,9 @@
+<launch>
+
+    <node pkg="people_count" type="dual_images_subscriber_node_alex.py" name="people_counter"
+        output="screen">
+    </node>
+
+
+</launch>
+  
