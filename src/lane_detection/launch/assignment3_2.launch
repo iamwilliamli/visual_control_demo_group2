@@ -1,0 +1,16 @@
+<launch>
+    <!-- <node pkg="jetson_camera" type="camera_publisher_node.py" name="camera_publisher_node"
+        output="screen">
+        <rosparam command="load" file="$(find jetson_camera)/config/parameters.yaml" />
+    </node> -->
+
+    <!-- <node pkg="jetson_camera" type="image_processing_node.py" name="image_processing_node"
+        output="screen">
+    </node> -->
+
+    <node pkg="lane_detection" type="lane_detection_node.py" name="lane_detection_node"
+        output="screen" />
+
+    <!-- <node pkg="lane_detection" type="lane_follower_node.py" name="lane_follower_node" 
+        output="screen" /> -->
+</launch>

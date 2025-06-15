@@ -1,0 +1,21 @@
+<launch>
+    <node pkg="coordinator" type="coordinator_node.py" name="coordinator" output="screen" respawn="true">
+    </node>
+    <node pkg="button_mode_switcher" type="button_node.py" name="button_node" output="screen" respawn="true">
+    </node>
+    <node pkg="jetson_camera" type="camera_publisher_node.py" name="camera_publisher_node" output="screen" respawn="true">
+        <rosparam command="load" file="$(find jetson_camera)/config/parameters.yaml" />
+    </node>
+    <!-- <node pkg="jetson_camera" type="image_processing_node.py" name="undistortion_node" output="screen" respawn="true"/> -->
+    <node pkg="display_module" type="show_stats_node.py" name="display_stats_node" output="screen" respawn="true">
+    </node>
+    <node pkg="motor_api" type="motor_api_node.py" name="motor_node" output="screen" respawn="true">
+    </node>
+    <node pkg="lane_detection" type="lane_follower_node.py" name="lane_follower_node" 
+    output="screen" />
+
+
+    <node pkg="motor_api" type="motor_encoder_node.py" name="motor_encoder_node"
+    output="screen">
+    </node>
+</launch>

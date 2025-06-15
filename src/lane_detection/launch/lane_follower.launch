@@ -1,0 +1,15 @@
+<launch>
+    <!-- <node pkg="lane_detection" type="lane_detection_node.py" name="lane_detection_node"
+        output="screen" /> -->
+
+    <node pkg="lane_detection" type="lane_follower_node.py" name="lane_follower_node" 
+        output="screen" />
+
+    <node pkg="motor_api" type="motor_api_node.py" name="motor_api_node"
+        output="screen">
+    </node>
+
+    <node pkg="motor_api" type="motor_encoder_node.py" name="motor_encoder_node"
+        output="screen">
+    </node>
+</launch>

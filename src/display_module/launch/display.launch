@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- Display Stats Node -->
+    <node pkg="display_module" type="show_stats_node.py" name="display_stats_node" output="screen">
+    </node>
+</launch>

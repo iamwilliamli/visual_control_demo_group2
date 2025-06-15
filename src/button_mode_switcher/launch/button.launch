@@ -1,0 +1,4 @@
+<launch>
+  <node pkg="button_mode_switcher" type="button_node.py" name="button_node" output="screen">
+  </node>
+</launch>

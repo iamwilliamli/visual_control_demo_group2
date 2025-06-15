@@ -1,0 +1,4 @@
+<launch>
+  <node pkg="coordinator" type="coordinator_node.py" name="coordinator" output="screen">
+  </node>
+</launch>

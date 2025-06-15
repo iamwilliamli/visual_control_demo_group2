@@ -1,0 +1,4 @@
+<launch>
+  <node pkg="motor_api" type="motor_api_node.py" name="motor_node" output="screen">
+  </node>
+</launch>
