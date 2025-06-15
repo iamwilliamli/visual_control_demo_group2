@@ -68,7 +68,7 @@ class AlarmOmniNode:
                     rospy.loginfo("motor_is_running True")
 
                     msg = Bool()
-                    msg.data = True
+                    msg.data = False
                     self.stable_pub.publish(msg)
                     
                     cmd = MotorCommand()
