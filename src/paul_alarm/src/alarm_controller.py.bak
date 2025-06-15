@@ -1,0 +1,104 @@
+#!/usr/bin/env python
+
+import traceback
+import rospy
+import cv2
+from cv_bridge import CvBridge
+# from sensor_msgs.msg import Image, CompressedImage
+from std_msgs.msg import Float32, Float32MultiArray, MultiArrayLayout, MultiArrayDimension, Bool
+from motor_api.msg import MotorCommand, MotorCommandStatus
+import numpy as np
+
+class AlarmControllerNode:
+    def __init__(self):
+        self.initialized = False
+        rospy.init_node('alarm_controller_node', anonymous=False, xmlrpc_port=45204, tcpros_port=45205)
+        self.motion_sub = rospy.Subscriber('/motion/area', Float32, self.area_callback)
+        self.largest_sub = rospy.Subscriber('/motion/largest', Float32MultiArray, self.largest_callback)
+        self.motor_sub = rospy.Subscriber('/motor/results', MotorCommandStatus, self.motor_callback)
+        self.motor_pub = rospy.Publisher('/motor/endpoint', MotorCommand, queue_size=1)
+        self.alarm_pub = rospy.Publisher('/alarm', Bool, queue_size=5)
+        self.last_area = 640*400
+        self.alarm_enabled = False
+        self.motor_done = True
+        self.cmd_id = None
+        self.last_id = 0
+        self.go_right = False
+        self.initialized = True
+        rospy.loginfo("Alarm controller node initialized")
+    
+    def largest_callback(self, msg):
+        if not self.initialized:
+            return
+        rospy.loginfo("largest_callback")
+        try:
+            if msg.layout.dim[0].size != 5:
+                raise ValueError("Incompatible array size: {}".format(msg.layout.dim[0].size))
+            (x, y, w, h, largest_area) = msg.data[0], msg.data[1], msg.data[2], msg.data[3], msg.data[4]
+            if not self.alarm_enabled:
+                return
+            if largest_area < 10000:
+                return
+            rospy.loginfo("Alarm!")
+            self.alarm_enabled = False
+            self.motor_done = False
+            self.last_id += int(self.last_area) + 1
+            self.cmd_id = self.last_id
+
+            cmd = MotorCommand()
+            cmd.id = self.last_id
+            cmd.forward = 0
+            cmd.right = (1 if self.go_right > 0 else -1) * 20
+            self.go_right = not self.go_right
+            cmd.speed = 1.0
+            cmd.do_immediately = True
+            self.motor_pub.publish(cmd)
+            msg = Bool()
+            msg.data = True
+            self.alarm_pub.publish(msg)
+            # rospy.sleep(3.)
+            # rospy.loginfo("Resetting motor")
+            # self.motor_done = True
+        except Exception as e:
+            rospy.logerr("Error in largest_callback: %s\n%s\n", e, traceback.format_exc())
+
+    def motor_callback(self, msg):
+        if not self.initialized:
+            return
+        rospy.loginfo("motor_callback")
+        try:
+            if self.cmd_id is None:
+                rospy.loginfo("cmd_id is None")
+                return
+            rospy.loginfo("Completed ID {} =?= {}".format(msg.command.id, self.cmd_id))
+            if msg.command.id == self.cmd_id:
+                self.motor_done = True
+        except Exception as e:
+            rospy.logerr("Error in motor_callback: %s\n%s\n", e, traceback.format_exc())
+
+    def area_callback(self, msg):
+        if not self.initialized:
+            return
+        rospy.loginfo("area_callback")
+        try:
+            self.last_area = msg.data
+            # if self.last_area > 10000:
+            #     rospy.loginfo("Area: {}".format(self.last_area))
+            if not self.alarm_enabled and self.motor_done:
+                if self.last_area < 640*400/2:
+                    rospy.loginfo("Resetting in 1 second")
+                    rospy.sleep(1.)
+                    msg = Bool()
+                    msg.data = False
+                    self.alarm_pub.publish(msg)
+                    self.alarm_enabled = True
+        except Exception as e:
+            rospy.logerr("Error area_callback: %s\n%s\n", e, traceback.format_exc())
+        
+
+if __name__ == '__main__':
+    try:
+        node = AlarmControllerNode()
+        rospy.spin()
+    except rospy.ROSInterruptException:
+        pass
